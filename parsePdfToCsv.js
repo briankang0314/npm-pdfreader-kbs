@@ -1,18 +1,21 @@
-const { PdfReader } = require("pdfreader");
-const fs = require("fs");
+import { PdfReader } from "./index.js";
+import fs from "fs";
+// Import TableParser correctly if it's exported directly
+// For example, if TableParser is exported from the root, adjust the path accordingly
+import { TableParser } from "./lib/TableParser.js";
 
-const filename = "path/to/your/sample-table.pdf"; // Adjust path to your PDF
+const filename = "/workspaces/npm-pdfreader-kbs/test/sample-table.pdf"; // Adjust path to your PDF
 const outputCsvFilename = "output.csv"; // Output CSV file path
 
-// Helper functions from parseTable.js, adapted for CSV output
+// Helper functions adapted for CSV output
 const padColumns = (array, nb) => Array.apply(null, { length: nb }).map((val, i) => array[i] || []);
 const mergeCells = (cells) => (cells || []).map((cell) => cell.text).join('');
 const renderCsv = (matrix, nbCols) => (matrix || [])
   .map((row) => padColumns(row, nbCols).map(mergeCells).join(",")).join("\n");
 
-let table = new (require("pdfreader").TableParser)();
+let table = new TableParser();
 
-new PdfReader().parseFileItems(filename, function (err, item) {
+new PdfReader().parseFileItems(filename, function(err, item) {
   if (err) console.error("PDF parsing error:", err);
   else if (!item) { // End of file
     const csvContent = renderCsv(table.getMatrix(), 5); // Adjust '5' to match the number of columns in your PDF table
